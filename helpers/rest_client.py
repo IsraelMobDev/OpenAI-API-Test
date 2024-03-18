@@ -1,3 +1,4 @@
+import json
 import logging
 
 import requests
@@ -24,6 +25,21 @@ class RestClient:
         :return:
         """
         response = self.select_method(method_name, self.session)(url=url, data=body)
+        LOGGER.debug("Status Code %s: ", response.status_code)
+        LOGGER.debug("Response Content %s: ", response.text)
+
+        return response
+
+    def request_json(self, method_name, url, body=None):
+        """
+        Method to call to request methods
+        :param method_name:     GET, POST, PUT, DELETE
+        :param url:
+        :param body:            body to use in request (JSON format)
+        :return:                response object
+        """
+        response = self.select_method(method_name, self.session)(url=url, json=body)
+
         LOGGER.debug("Status Code %s: ", response.status_code)
         LOGGER.debug("Response Content %s: ", response.text)
 

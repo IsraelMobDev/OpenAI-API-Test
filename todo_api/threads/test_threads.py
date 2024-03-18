@@ -25,32 +25,42 @@ class TestThreads:
         self.list_threads.append(id_project_created)
         assert response.status_code == 200, "wrong status code, expected 200"
 
-    def test_delete_thread(self, create_project, test_log_name):
+    def test_get_thread(self, create_thread, test_log_name):
+        LOGGER.debug("Thread to read: %s", create_thread)
+        url_todo_get = f"{self.url_threads}/{create_thread}"
+        response = self.rest_client.request("get", url=url_todo_get)
+        self.list_threads.append(create_thread)
+        assert response.status_code == 200, "wrong status code, expected 200"
 
-        url_todo = f"{self.url_threads}/{create_project}"
+    def test_delete_thread(self, create_thread, test_log_name):
+
+        url_todo = f"{self.url_threads}/{create_thread}"
         LOGGER.debug("URL to delete: %s", url_todo)
 
         response = self.rest_client.request("delete", url=url_todo)
+        # In the case of Open AI it returns status 200 when a thread is deleted
+        assert response.status_code == 200, "wrong status code, expected 200"
 
-        assert response.status_code == 204, "wrong status code, expected 204"
+    def test_update_thread(self, create_thread, test_log_name):
 
-    def test_update_thread(self, create_project, test_log_name):
-
-        LOGGER.debug("Project to update: %s", create_project)
-        url_todo_update = f"{self.url_threads}/{create_project}"
-        body_project = {
-            "name": "Update project"
+        LOGGER.debug("Thread to update: %s", create_thread)
+        url_todo_update = f"{self.url_threads}/{create_thread}"
+        body_thread = {
+            "metadata": {
+                "modified": "true",
+                "user": "abc123"
+            }
         }
-        response = self.rest_client.request("post", url=url_todo_update, body=body_project)
+        response = self.rest_client.request_json("post", url=url_todo_update, body=body_thread)
 
-        # add to list of projects to be deleted in cleanup
-        self.list_threads.append(create_project)
+        # add to list of threads to be deleted in cleanup
+        self.list_threads.append(create_thread)
         assert response.status_code == 200, "wrong status code, expected 200"
 
     @classmethod
     def teardown_class(cls):
         """
-        Delete all projects used in test
+        Delete all threads used in test
         """
         LOGGER.info("Cleanup threads...")
         for id_project in cls.list_threads:

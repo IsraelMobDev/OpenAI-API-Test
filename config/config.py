@@ -5,6 +5,7 @@ load_dotenv()
 token_todo = os.getenv("TOKEN")
 URL_TODO = "https://api.openai.com/v1/"
 HEADERS_TODO = {
+    "Content-Type": "application/json",
     "Authorization": f"Bearer {token_todo}",
     "OpenAI-Beta": "assistants=v1"
 }
